@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Starter project for a Claude Code course (codewithmosh.com). A small React + Vite expense/finance tracker. Per the README, it **intentionally** has a bug, poor UI, and messy code, meant to be fixed progressively during the course — don't assume messiness or the bug are accidental unless asked to address them.
+Starter project for a Claude Code course (codewithmosh.com). A small React + Vite expense/finance tracker. Per the README, it **originally** had an intentional bug, poor UI, and messy code, meant to be fixed progressively during the course. The string/number totals bug and the single-file `App.jsx` have since been addressed (see Architecture below) — don't assume remaining rough edges (e.g. plain unstyled UI) are accidental unless asked to address them.
 
 ## Commands
 
@@ -20,10 +20,13 @@ There is no test suite configured in this project.
 
 ## Architecture
 
-This is an unusually small, single-file app — there is no component split, no routing, and no state management library.
+Small React app, no routing, no state management library, no persistence (transactions live in `useState` only — a page reload resets to the hardcoded seed data).
 
 - `src/main.jsx` — entry point, mounts `<App />` into `#root` inside `StrictMode`.
-- `src/App.jsx` — the entire application: transaction state, the add-transaction form, filters, and the summary/table UI all live in one component function. Transactions are kept in local `useState` only (no persistence — a page reload resets to the hardcoded seed data).
+- `src/App.jsx` — owns the `transactions` state (seed data + `handleAddTransaction`) and the shared `categories` array, and composes the three components below. Does not compute totals or filtering itself.
+- `src/Summary.jsx` — takes `transactions` as a prop and computes `totalIncome`/`totalExpenses`/`balance` internally.
+- `src/TransactionForm.jsx` — takes `categories` and `onAddTransaction` as props; owns its own form field state (description/amount/type/category) and calls `onAddTransaction` with a fully-formed transaction on submit.
+- `src/TransactionList.jsx` — takes `transactions` and `categories` as props; owns its own `filterType`/`filterCategory` state and derives `filteredTransactions` internally.
 - `src/App.css` / `src/index.css` — plain CSS, no CSS-in-JS or utility framework.
-- Transaction shape: `{ id, description, amount, type: "income"|"expense", category, date }`. `amount` is stored as a **string** (from form input), which is the source of the intentional bug: `totalIncome`/`totalExpenses` are computed via `reduce((sum, t) => sum + t.amount, 0)` without numeric coercion, so amounts concatenate as strings instead of summing.
-- `categories` is a fixed local array (`food, housing, utilities, transport, entertainment, salary, other`); there's no separate category/type model, income vs. expense is just the `type` field.
+- Transaction shape: `{ id, description, amount, type: "income"|"expense", category, date }`. `amount` is stored as a **number** — both the seed data and `TransactionForm`'s submit handler (`Number(amount)`) enforce this, since summing string amounts was the project's original intentional bug (now fixed).
+- `categories` is a fixed array (`food, housing, utilities, transport, entertainment, salary, other`) owned by `App.jsx` and passed down; there's no separate category/type model, income vs. expense is just the `type` field.
