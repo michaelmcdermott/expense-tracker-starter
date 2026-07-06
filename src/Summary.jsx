@@ -25,7 +25,12 @@ function Summary({ transactions }) {
         <p className="expense-amount">${totalExpenses.toLocaleString()}</p>
       </div>
       <div className="summary-cell summary-cell-balance">
-        <div className="dial" role="img" aria-label={`Balance $${balance.toLocaleString()}`}>
+        <div
+          className="dial"
+          role="img"
+          aria-label={`Balance $${balance.toLocaleString()}`}
+          style={{ '--needle-color': balance >= 0 ? 'var(--credit)' : 'var(--debit)' }}
+        >
           <div className="dial-needle" style={{ transform: `rotate(${needleDeg}deg)` }} />
           <div className="dial-face">
             <p className="balance-amount">${balance.toLocaleString()}</p>
