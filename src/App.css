@@ -49,6 +49,29 @@ h1 {
   font-weight: bold;
 }
 
+.spending-chart {
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin-bottom: 24px;
+  background: #fff;
+}
+
+.spending-chart h2 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.spending-chart-panels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.spending-chart-panels > div {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
 .add-transaction {
   border: 1px solid #ddd;
   padding: 16px;

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import Summary from './Summary.jsx'
+import SpendingChart from './SpendingChart.jsx'
 import TransactionForm from './TransactionForm.jsx'
 import TransactionList from './TransactionList.jsx'
 
@@ -22,6 +23,10 @@ function App() {
     setTransactions([...transactions, newTransaction]);
   };
 
+  const handleDeleteTransaction = (id) => {
+    setTransactions(transactions.filter(t => t.id !== id));
+  };
+
   return (
     <div className="app">
       <h1>Finance Tracker</h1>
@@ -29,9 +34,11 @@ function App() {
 
       <Summary transactions={transactions} />
 
+      <SpendingChart transactions={transactions} categories={categories} />
+
       <TransactionForm categories={categories} onAddTransaction={handleAddTransaction} />
 
-      <TransactionList transactions={transactions} categories={categories} />
+      <TransactionList transactions={transactions} categories={categories} onDeleteTransaction={handleDeleteTransaction} />
     </div>
   );
 }
