@@ -1,3 +1,16 @@
+:root {
+  --paper: #edf2e7;
+  --sheet: #fbfcf9;
+  --ink: #1b2119;
+  --rule: #c7d6bc;
+  --debit: #a8291f;
+  --stamp: #1f3b57;
+
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-body: 'Public Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,7 +18,22 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background-color: #ffffff;
-  color: #333;
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--stamp);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

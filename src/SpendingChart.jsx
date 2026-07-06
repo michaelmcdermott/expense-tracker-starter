@@ -12,29 +12,13 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
-
-// Fixed categorical order/hues so a category always gets the same color,
-// regardless of how the data is sorted or filtered.
-const CATEGORY_COLORS = {
-  food: '#2a78d6',
-  housing: '#1baf7a',
-  utilities: '#eda100',
-  transport: '#008300',
-  entertainment: '#4a3aa7',
-  salary: '#e34948',
-  other: '#e87ba4',
-}
-const OTHER_COLOR = '#898781'
+import { colorFor } from './categoryColors'
 
 // Past this many slices/bars, adjacent ones blur together - fold the
 // smallest into a single "Other" entry instead of generating another hue.
 const MAX_SLICES = 6
 
 const RADIAN = Math.PI / 180
-
-function colorFor(category) {
-  return category === 'Other' ? OTHER_COLOR : CATEGORY_COLORS[category] || OTHER_COLOR
-}
 
 function ColoredSector(props) {
   return <Sector {...props} fill={colorFor(props.payload.category)} stroke="#fff" strokeWidth={2} />
@@ -53,7 +37,7 @@ function renderSliceLabel({ cx, cy, midAngle, outerRadius, percent, payload }) {
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
   const y = cy + radius * Math.sin(-midAngle * RADIAN)
   return (
-    <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fill="#666" fontSize={12}>
+    <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fill="#5b6b57" fontSize={12}>
       {`${payload.category} ${Math.round(percent * 100)}%`}
     </text>
   )
@@ -61,8 +45,8 @@ function renderSliceLabel({ cx, cy, midAngle, outerRadius, percent, payload }) {
 
 function renderValueLabel({ x, y, width, value }) {
   return (
-    <text x={x + width / 2} y={y} dy={-6} textAnchor="middle" fill="#333" fontSize={12}>
-      ${value}
+    <text x={x + width / 2} y={y} dy={-6} textAnchor="middle" fill="#1b2119" fontSize={12} fontFamily="IBM Plex Mono, monospace">
+      ${value.toLocaleString()}
     </text>
   )
 }
@@ -82,7 +66,7 @@ function SpendingChart({ transactions, categories }) {
     return null
   }
 
-  const data =
+  const data = (
     totals.length <= MAX_SLICES
       ? totals
       : [
@@ -92,6 +76,7 @@ function SpendingChart({ transactions, categories }) {
             amount: totals.slice(MAX_SLICES - 1).reduce((sum, c) => sum + c.amount, 0),
           },
         ]
+  ).map(d => ({ ...d, fill: colorFor(d.category) }))
 
   return (
     <div className="spending-chart">
@@ -109,17 +94,19 @@ function SpendingChart({ transactions, categories }) {
               labelLine={false}
               isAnimationActive={false}
             />
-            <Tooltip formatter={(value, name, props) => [`$${value} (${Math.round(props.payload.percent * 100)}%)`, name]} />
+            <Tooltip
+              formatter={(value, name, props) => [`$${value.toLocaleString()} (${Math.round(props.payload.percent * 100)}%)`, name]}
+            />
             <Legend />
           </PieChart>
         </ResponsiveContainer>
 
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={data} margin={{ top: 20, right: 10, left: 0, bottom: 5 }}>
-            <CartesianGrid stroke="#e1e0d9" vertical={false} />
-            <XAxis dataKey="category" tick={{ fill: '#666', fontSize: 13 }} />
-            <YAxis tick={{ fill: '#898781', fontSize: 12 }} tickFormatter={value => `$${value}`} />
-            <Tooltip formatter={value => [`$${value}`, 'Spent']} cursor={{ fill: '#f5f5f5' }} />
+            <CartesianGrid stroke="#c7d6bc" vertical={false} />
+            <XAxis dataKey="category" tick={{ fill: '#5b6b57', fontSize: 13 }} />
+            <YAxis tick={{ fill: '#898781', fontSize: 12 }} tickFormatter={value => `$${value.toLocaleString()}`} />
+            <Tooltip formatter={value => [`$${value.toLocaleString()}`, 'Spent']} cursor={{ fill: '#f5f5f5' }} />
             <Bar dataKey="amount" shape={ColoredBar} label={renderValueLabel} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>

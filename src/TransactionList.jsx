@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { colorFor } from './categoryColors'
 
 function TransactionList({ transactions, categories, onDeleteTransaction }) {
   const [filterType, setFilterType] = useState("all");
@@ -11,6 +12,13 @@ function TransactionList({ transactions, categories, onDeleteTransaction }) {
   if (filterCategory !== "all") {
     filteredTransactions = filteredTransactions.filter(t => t.category === filterCategory);
   }
+
+  const totalIn = filteredTransactions
+    .filter(t => t.type === "income")
+    .reduce((sum, t) => sum + t.amount, 0);
+  const totalOut = filteredTransactions
+    .filter(t => t.type === "expense")
+    .reduce((sum, t) => sum + t.amount, 0);
 
   return (
     <div className="transactions">
@@ -29,41 +37,54 @@ function TransactionList({ transactions, categories, onDeleteTransaction }) {
         </select>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Amount</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredTransactions.map(t => (
-            <tr key={t.id}>
-              <td>{t.date}</td>
-              <td>{t.description}</td>
-              <td>{t.category}</td>
-              <td className={t.type === "income" ? "income-amount" : "expense-amount"}>
-                {t.type === "income" ? "+" : "-"}${t.amount}
-              </td>
-              <td>
-                <button
-                  className="delete-btn"
-                  onClick={() => {
-                    if (window.confirm(`Delete "${t.description}"?`)) {
-                      onDeleteTransaction(t.id);
-                    }
-                  }}
-                >
-                  Delete
-                </button>
-              </td>
+      <div className="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th className="amount-col">Money In</th>
+              <th className="amount-col">Money Out</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredTransactions.map(t => (
+              <tr key={t.id}>
+                <td className="date-cell">{t.date}</td>
+                <td>{t.description}</td>
+                <td>
+                  <span className="category-dot" style={{ backgroundColor: colorFor(t.category) }} />
+                  {t.category}
+                </td>
+                <td className="amount-col income-amount">{t.type === "income" ? `$${t.amount.toLocaleString()}` : "—"}</td>
+                <td className="amount-col expense-amount">{t.type === "expense" ? `$${t.amount.toLocaleString()}` : "—"}</td>
+                <td>
+                  <button
+                    className="void-btn"
+                    onClick={() => {
+                      if (window.confirm(`Void "${t.description}"? This can't be undone.`)) {
+                        onDeleteTransaction(t.id);
+                      }
+                    }}
+                  >
+                    Void
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={3} className="totals-label">Total</td>
+              <td className="amount-col income-amount">${totalIn.toLocaleString()}</td>
+              <td className="amount-col expense-amount">${totalOut.toLocaleString()}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   );
 }
