@@ -31,7 +31,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <p className="eyebrow">Personal Ledger</p>
-        <h1>Mike Finance Tracker</h1>
+        <h1>Mike_McD Finance Tracker</h1>
         <p className="subtitle">Track your income and expenses</p>
       </header>
 

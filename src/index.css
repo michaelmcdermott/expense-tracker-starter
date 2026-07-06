@@ -1,13 +1,15 @@
 :root {
-  --paper: #edf2e7;
-  --sheet: #fbfcf9;
-  --ink: #1b2119;
-  --rule: #c7d6bc;
-  --debit: #a8291f;
-  --stamp: #1f3b57;
+  --vault: #0d211b;
+  --panel: #15332a;
+  --panel-2: #1b3d32;
+  --brass: #c9a24b;
+  --brass-dim: #6c5a2f;
+  --ivory: #ede6d6;
+  --credit: #4fb286;
+  --debit: #b4553b;
 
-  --font-display: 'Fraunces', ui-serif, Georgia, serif;
-  --font-body: 'Public Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Zilla Slab', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;
 }
 
@@ -19,12 +21,12 @@
 
 body {
   font-family: var(--font-body);
-  background-color: var(--paper);
-  color: var(--ink);
+  background-color: var(--vault);
+  color: var(--ivory);
 }
 
 :focus-visible {
-  outline: 2px solid var(--stamp);
+  outline: 2px solid var(--brass);
   outline-offset: 2px;
 }
 
