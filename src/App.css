@@ -14,6 +14,9 @@
 .app > *:nth-child(3) { animation-delay: 0.12s; }
 .app > *:nth-child(4) { animation-delay: 0.18s; }
 .app > *:nth-child(5) { animation-delay: 0.24s; }
+/* Any section added beyond the 5th keeps the last stagger delay instead of
+   silently resetting to 0s (which would make it pop in with the first). */
+.app > *:nth-child(n+6) { animation-delay: 0.24s; }
 
 @keyframes sheet-in {
   from {

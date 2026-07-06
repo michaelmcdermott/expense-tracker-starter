@@ -1,19 +1,26 @@
 import { useState } from 'react'
 
-function TransactionForm({ categories, onAddTransaction }) {
+function TransactionForm({ categoriesByType, onAddTransaction }) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("expense");
-  const [category, setCategory] = useState("food");
+  const [category, setCategory] = useState(categoriesByType.expense[0]);
+
+  const handleTypeChange = (newType) => {
+    setType(newType);
+    setCategory(categoriesByType[newType][0]);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!description || !amount) return;
+    const trimmedDescription = description.trim();
+    const numericAmount = Number(amount);
+    if (!trimmedDescription || !(numericAmount > 0)) return;
 
     onAddTransaction({
-      id: Date.now(),
-      description,
-      amount: Number(amount),
+      id: crypto.randomUUID(),
+      description: trimmedDescription,
+      amount: numericAmount,
       type,
       category,
       date: new Date().toISOString().split('T')[0],
@@ -22,7 +29,7 @@ function TransactionForm({ categories, onAddTransaction }) {
     setDescription("");
     setAmount("");
     setType("expense");
-    setCategory("food");
+    setCategory(categoriesByType.expense[0]);
   };
 
   return (
@@ -41,15 +48,16 @@ function TransactionForm({ categories, onAddTransaction }) {
           placeholder="Amount"
           aria-label="Amount"
           className="amount-input"
+          min="0"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
-        <select value={type} onChange={(e) => setType(e.target.value)} aria-label="Type">
+        <select value={type} onChange={(e) => handleTypeChange(e.target.value)} aria-label="Type">
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
         <select value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Category">
-          {categories.map(cat => (
+          {categoriesByType[type].map(cat => (
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>

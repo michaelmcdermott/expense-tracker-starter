@@ -1,35 +1,29 @@
 import { useState } from 'react'
 import { colorFor } from './categoryColors'
+import { sumByType, formatCurrency } from './utils/transactions.js'
 
 function TransactionList({ transactions, categories, onDeleteTransaction }) {
   const [filterType, setFilterType] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
 
-  let filteredTransactions = transactions;
-  if (filterType !== "all") {
-    filteredTransactions = filteredTransactions.filter(t => t.type === filterType);
-  }
-  if (filterCategory !== "all") {
-    filteredTransactions = filteredTransactions.filter(t => t.category === filterCategory);
-  }
+  const filteredTransactions = transactions.filter(t =>
+    (filterType === "all" || t.type === filterType) &&
+    (filterCategory === "all" || t.category === filterCategory)
+  );
 
-  const totalIn = filteredTransactions
-    .filter(t => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
-  const totalOut = filteredTransactions
-    .filter(t => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const filteredTotalIn = sumByType(filteredTransactions, "income");
+  const filteredTotalOut = sumByType(filteredTransactions, "expense");
 
   return (
     <div className="transactions">
       <h2>Transactions</h2>
       <div className="filters">
-        <select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+        <select value={filterType} onChange={(e) => setFilterType(e.target.value)} aria-label="Filter by type">
           <option value="all">All Types</option>
           <option value="income">Income</option>
           <option value="expense">Expense</option>
         </select>
-        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} aria-label="Filter by category">
           <option value="all">All Categories</option>
           {categories.map(cat => (
             <option key={cat} value={cat}>{cat}</option>
@@ -58,8 +52,8 @@ function TransactionList({ transactions, categories, onDeleteTransaction }) {
                   <span className="category-dot" style={{ backgroundColor: colorFor(t.category) }} />
                   {t.category}
                 </td>
-                <td className="amount-col income-amount">{t.type === "income" ? `$${t.amount.toLocaleString()}` : "—"}</td>
-                <td className="amount-col expense-amount">{t.type === "expense" ? `$${t.amount.toLocaleString()}` : "—"}</td>
+                <td className="amount-col income-amount">{t.type === "income" ? formatCurrency(t.amount) : "—"}</td>
+                <td className="amount-col expense-amount">{t.type === "expense" ? formatCurrency(t.amount) : "—"}</td>
                 <td>
                   <button
                     className="void-btn"
@@ -78,8 +72,8 @@ function TransactionList({ transactions, categories, onDeleteTransaction }) {
           <tfoot>
             <tr>
               <td colSpan={3} className="totals-label">Total</td>
-              <td className="amount-col income-amount">${totalIn.toLocaleString()}</td>
-              <td className="amount-col expense-amount">${totalOut.toLocaleString()}</td>
+              <td className="amount-col income-amount">{formatCurrency(filteredTotalIn)}</td>
+              <td className="amount-col expense-amount">{formatCurrency(filteredTotalOut)}</td>
               <td></td>
             </tr>
           </tfoot>

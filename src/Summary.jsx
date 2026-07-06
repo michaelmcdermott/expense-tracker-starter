@@ -1,12 +1,8 @@
+import { sumByType, formatCurrency } from './utils/transactions.js'
+
 function Summary({ transactions }) {
-  const totalIncome = transactions
-    .filter(t => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalExpenses = transactions
-    .filter(t => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
-
+  const totalIncome = sumByType(transactions, "income");
+  const totalExpenses = sumByType(transactions, "expense");
   const balance = totalIncome - totalExpenses;
 
   // Needle sweeps a 180deg arc: fully left (-90deg) means the balance is
@@ -18,22 +14,22 @@ function Summary({ transactions }) {
     <div className="summary">
       <div className="summary-cell">
         <h3>Money In</h3>
-        <p className="income-amount">${totalIncome.toLocaleString()}</p>
+        <p className="income-amount">{formatCurrency(totalIncome)}</p>
       </div>
       <div className="summary-cell">
         <h3>Money Out</h3>
-        <p className="expense-amount">${totalExpenses.toLocaleString()}</p>
+        <p className="expense-amount">{formatCurrency(totalExpenses)}</p>
       </div>
       <div className="summary-cell summary-cell-balance">
         <div
           className="dial"
           role="img"
-          aria-label={`Balance $${balance.toLocaleString()}`}
+          aria-label={`Balance ${formatCurrency(balance)}`}
           style={{ '--needle-color': balance >= 0 ? 'var(--credit)' : 'var(--debit)' }}
         >
           <div className="dial-needle" style={{ transform: `rotate(${needleDeg}deg)` }} />
           <div className="dial-face">
-            <p className="balance-amount">${balance.toLocaleString()}</p>
+            <p className="balance-amount">{formatCurrency(balance)}</p>
             <h3>Balance</h3>
           </div>
         </div>

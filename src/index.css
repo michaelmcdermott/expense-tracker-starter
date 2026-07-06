@@ -8,6 +8,11 @@
   --credit: #4fb286;
   --debit: #b4553b;
 
+  /* Chart-specific tones (recharts SVG props read these via var()) */
+  --chart-grid: #24463b;
+  --chart-tick: #7f8f86;
+  --chart-tick-strong: #b9c2ba;
+
   --font-display: 'Zilla Slab', Georgia, serif;
   --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', monospace;

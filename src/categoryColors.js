@@ -17,3 +17,15 @@ export const OTHER_COLOR = '#a8a296'
 export function colorFor(category) {
   return category === 'Other' ? OTHER_COLOR : CATEGORY_COLORS[category] || OTHER_COLOR
 }
+
+// The full category list is derived from CATEGORY_COLORS so a category can
+// never exist here without a matching color (or vice versa). Which type
+// each category applies to is separate metadata (colors don't imply type),
+// so it's tracked explicitly below, but co-located here as the one other
+// place category identity is defined.
+export const ALL_CATEGORIES = Object.keys(CATEGORY_COLORS)
+
+export const CATEGORIES_BY_TYPE = {
+  income: ['salary', 'other'],
+  expense: ['food', 'housing', 'utilities', 'transport', 'entertainment', 'other'],
+}

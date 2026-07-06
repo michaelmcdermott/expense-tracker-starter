@@ -13,6 +13,7 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { colorFor } from './categoryColors'
+import { sumByCategory, formatCurrency } from './utils/transactions.js'
 
 // Past this many slices/bars, adjacent ones blur together - fold the
 // smallest into a single "Other" entry instead of generating another hue.
@@ -20,8 +21,16 @@ const MAX_SLICES = 6
 
 const RADIAN = Math.PI / 180
 
+// Shared between both charts' tooltips so the vault palette only lives in
+// one place (index.css custom properties) instead of being restated here.
+const tooltipStyle = {
+  contentStyle: { background: 'var(--panel-2)', border: '1px solid var(--brass-dim)', borderRadius: 4, color: 'var(--ivory)' },
+  itemStyle: { color: 'var(--ivory)' },
+  labelStyle: { color: 'var(--ivory)' },
+}
+
 function ColoredSector(props) {
-  return <Sector {...props} fill={colorFor(props.payload.category)} stroke="#0d211b" strokeWidth={2} />
+  return <Sector {...props} fill={colorFor(props.payload.category)} stroke="var(--vault)" strokeWidth={2} />
 }
 
 function ColoredBar(props) {
@@ -37,7 +46,7 @@ function renderSliceLabel({ cx, cy, midAngle, outerRadius, percent, payload }) {
   const x = cx + radius * Math.cos(-midAngle * RADIAN)
   const y = cy + radius * Math.sin(-midAngle * RADIAN)
   return (
-    <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fill="#b9c2ba" fontSize={12}>
+    <text x={x} y={y} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" fill="var(--chart-tick-strong)" fontSize={12}>
       {`${payload.category} ${Math.round(percent * 100)}%`}
     </text>
   )
@@ -45,8 +54,8 @@ function renderSliceLabel({ cx, cy, midAngle, outerRadius, percent, payload }) {
 
 function renderValueLabel({ x, y, width, value }) {
   return (
-    <text x={x + width / 2} y={y} dy={-6} textAnchor="middle" fill="#ede6d6" fontSize={12} fontFamily="IBM Plex Mono, monospace">
-      ${value.toLocaleString()}
+    <text x={x + width / 2} y={y} dy={-6} textAnchor="middle" fill="var(--ivory)" fontSize={12} fontFamily="IBM Plex Mono, monospace">
+      {formatCurrency(value)}
     </text>
   )
 }
@@ -55,9 +64,7 @@ function SpendingChart({ transactions, categories }) {
   const totals = categories
     .map(category => ({
       category,
-      amount: transactions
-        .filter(t => t.type === 'expense' && t.category === category)
-        .reduce((sum, t) => sum + t.amount, 0),
+      amount: sumByCategory(transactions, category, 'expense'),
     }))
     .filter(c => c.amount > 0)
     .sort((a, b) => b.amount - a.amount)
@@ -95,26 +102,22 @@ function SpendingChart({ transactions, categories }) {
               isAnimationActive={false}
             />
             <Tooltip
-              formatter={(value, name, props) => [`$${value.toLocaleString()} (${Math.round(props.payload.percent * 100)}%)`, name]}
-              contentStyle={{ background: '#1b3d32', border: '1px solid #6c5a2f', borderRadius: 4, color: '#ede6d6' }}
-              itemStyle={{ color: '#ede6d6' }}
-              labelStyle={{ color: '#ede6d6' }}
+              formatter={(value, name, props) => [`${formatCurrency(value)} (${Math.round(props.payload.percent * 100)}%)`, name]}
+              {...tooltipStyle}
             />
-            <Legend wrapperStyle={{ color: '#ede6d6' }} />
+            <Legend wrapperStyle={{ color: 'var(--ivory)' }} />
           </PieChart>
         </ResponsiveContainer>
 
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={data} margin={{ top: 20, right: 10, left: 0, bottom: 5 }}>
-            <CartesianGrid stroke="#24463b" vertical={false} />
-            <XAxis dataKey="category" tick={{ fill: '#b9c2ba', fontSize: 13 }} />
-            <YAxis tick={{ fill: '#7f8f86', fontSize: 12 }} tickFormatter={value => `$${value.toLocaleString()}`} />
+            <CartesianGrid stroke="var(--chart-grid)" vertical={false} />
+            <XAxis dataKey="category" tick={{ fill: 'var(--chart-tick-strong)', fontSize: 13 }} />
+            <YAxis tick={{ fill: 'var(--chart-tick)', fontSize: 12 }} tickFormatter={value => formatCurrency(value)} />
             <Tooltip
-              formatter={value => [`$${value.toLocaleString()}`, 'Spent']}
-              cursor={{ fill: 'rgba(201, 162, 75, 0.08)' }}
-              contentStyle={{ background: '#1b3d32', border: '1px solid #6c5a2f', borderRadius: 4, color: '#ede6d6' }}
-              itemStyle={{ color: '#ede6d6' }}
-              labelStyle={{ color: '#ede6d6' }}
+              formatter={value => [formatCurrency(value), 'Spent']}
+              cursor={{ fill: 'color-mix(in srgb, var(--brass) 8%, transparent)' }}
+              {...tooltipStyle}
             />
             <Bar dataKey="amount" shape={ColoredBar} label={renderValueLabel} isAnimationActive={false} />
           </BarChart>
